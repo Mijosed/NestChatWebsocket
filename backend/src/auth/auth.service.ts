@@ -13,17 +13,28 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const existing = await this.prisma.user.findFirst({
+      where: { OR: [{ email: dto.email }, { username: dto.username }] },
     });
     if (existing) {
-      throw new ConflictException('Email already in use');
+      throw new ConflictException(
+        existing.email === dto.email ? 'Email already in use' : 'Username already taken',
+      );
     }
 
     const hashed = await bcrypt.hash(dto.password, 10);
     const user = await this.prisma.user.create({
-      data: { email: dto.email, password: hashed },
+      data: { email: dto.email, username: dto.username, password: hashed },
     });
+
+    const general = await this.prisma.room.findFirst({
+      where: { name: 'Général' },
+    });
+    if (general) {
+      await this.prisma.roomMember.create({
+        data: { userId: user.id, roomId: general.id, hasHistory: true },
+      });
+    }
 
     return { id: user.id, email: user.email };
   }

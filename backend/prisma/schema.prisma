@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -17,7 +11,63 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  username  String?  @unique
+  color     String   @default("#3b82f6")
   password  String
   created   DateTime @default(now())
   updated   DateTime @updatedAt
+
+  messages     Message[]
+  members      RoomMember[]
+  reactions    Reaction[]
+  createdRooms Room[]
+}
+
+model Room {
+  id        String   @id @default(uuid())
+  name      String
+  creatorId String?
+  created   DateTime @default(now())
+
+  creator  User?        @relation(fields: [creatorId], references: [id])
+  members  RoomMember[]
+  messages Message[]
+}
+
+model RoomMember {
+  id         String   @id @default(uuid())
+  userId     String
+  roomId     String
+  hasHistory Boolean  @default(true)
+  joinedAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
+
+  @@unique([userId, roomId])
+}
+
+model Message {
+  id      String   @id @default(uuid())
+  content String
+  userId  String
+  roomId  String
+  created DateTime @default(now())
+
+  user      User       @relation(fields: [userId], references: [id])
+  room      Room       @relation(fields: [roomId], references: [id])
+  reactions Reaction[]
+}
+
+model Reaction {
+  id        String   @id @default(uuid())
+  emoji     String
+  userId    String
+  messageId String
+  created   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  message Message @relation(fields: [messageId], references: [id])
+
+  @@unique([userId, messageId, emoji])
 }
