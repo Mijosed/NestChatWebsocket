@@ -64,7 +64,7 @@ async function main() {
       data: { content: 'Hello !', userId: mijose.id, roomId: general.id },
     }),
     prisma.message.create({
-      data: { content: 'Ça marche bien ce chat 🎉', userId: anthony.id, roomId: general.id },
+      data: { content: 'Ça marche bien ce chat !', userId: anthony.id, roomId: general.id },
     }),
   ]);
 
@@ -78,10 +78,10 @@ async function main() {
     data: { content: 'Canal privé dispo !', userId: quentin.id, roomId: room2.id },
   });
 
-  console.log('✅ Seed terminé');
-  console.log('   quentin@test.com / test1234');
-  console.log('   mijose@test.com / test1234');
-  console.log('   anthony@test.com / test1234');
+  console.log('Seed terminé');
+  console.log('quentin@test.com / test1234');
+  console.log('mijose@test.com / test1234');
+  console.log('anthony@test.com / test1234');
 }
 
 main()
