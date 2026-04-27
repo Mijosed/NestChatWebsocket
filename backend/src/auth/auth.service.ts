@@ -18,7 +18,7 @@ export class AuthService {
     });
     if (existing) {
       throw new ConflictException(
-        existing.email === dto.email ? 'Email already in use' : 'Username already taken',
+        existing.email === dto.email ? 'Email déjà utilisé' : 'Ce nom est déjà pris',
       );
     }
 
@@ -44,12 +44,12 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Identifiants invalides');
     }
 
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Identifiants invalides');
     }
 
     const token = await this.jwtService.signAsync({
